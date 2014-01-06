@@ -51,6 +51,7 @@ int main(int, const char **)
 		std::clog << "[INFO] GL_SHADING_LANGUAGE_VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
 		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_CULL_FACE);
 
 		shader transform(GL_VERTEX_SHADER), solid_red(GL_FRAGMENT_SHADER);
 		transform.load("shaders/transform.glsl");
@@ -80,10 +81,12 @@ int main(int, const char **)
 		glm::mat4 modelview = glm::lookAt(glm::vec3(0.f, 0.f, 5.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 1.f, 100.f);
 
-		test.set_uniform("modelview", modelview);
 		test.set_uniform("projection", projection);
 
 		while (!glfwWindowShouldClose(window)) {
+			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 1.f, 0.f));
+			test.set_uniform("modelview", modelview);
+			glfwSetTime(0);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			glDrawArrays(GL_TRIANGLES, 0, 3);
