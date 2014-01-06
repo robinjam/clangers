@@ -52,6 +52,7 @@ int main(int, const char **)
 
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
 
 		shader transform(GL_VERTEX_SHADER), solid_red(GL_FRAGMENT_SHADER);
 		transform.load("shaders/transform.glsl");
@@ -87,7 +88,7 @@ int main(int, const char **)
 			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 1.f, 0.f));
 			test.set_uniform("modelview", modelview);
 			glfwSetTime(0);
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 
