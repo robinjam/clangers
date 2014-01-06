@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "shader.hpp"
 
@@ -48,4 +49,15 @@ void program::link()
 void program::use()
 {
 	glUseProgram(name);
+}
+
+void program::set_uniform(const char *uniform_name, const glm::mat4 &value)
+{
+	use();
+
+	GLint location = glGetUniformLocation(name, uniform_name);
+	if (location == -1)
+		std::cerr << "Warning: No uniform named '" << name << "' found." << std::endl;
+	else
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }

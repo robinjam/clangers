@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
 class shader;
 
@@ -15,6 +16,8 @@ public:
 	void link();
 
 	void use();
+
+	void set_uniform(const char *uniform_name, const glm::mat4 &value);
 
 private:
 	program(const program &);

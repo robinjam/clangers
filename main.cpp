@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "shader.hpp"
 #include "program.hpp"
@@ -46,15 +48,15 @@ int main(int, const char **)
 		std::clog << "[INFO] GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
 		std::clog << "[INFO] GL_SHADING_LANGUAGE_VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
-		shader passthrough(GL_VERTEX_SHADER), solid_red(GL_FRAGMENT_SHADER);
-		passthrough.load("shaders/passthrough.glsl");
+		shader transform(GL_VERTEX_SHADER), solid_red(GL_FRAGMENT_SHADER);
+		transform.load("shaders/transform.glsl");
 		solid_red.load("shaders/solid_red.glsl");
 
 		program test;
-		test.attach_shader(passthrough);
+		test.attach_shader(transform);
 		test.attach_shader(solid_red);
 		test.link();
-		test.detach_shader(passthrough);
+		test.detach_shader(transform);
 		test.detach_shader(solid_red);
 
 		test.use();
@@ -70,6 +72,12 @@ int main(int, const char **)
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_BYTE, GL_FALSE, 0, NULL);
 		glEnableVertexAttribArray(0);
+
+		glm::mat4 modelview = glm::lookAt(glm::vec3(0.f, 0.f, 5.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 1.f, 100.f);
+
+		test.set_uniform("modelview", modelview);
+		test.set_uniform("projection", projection);
 
 		while (!glfwWindowShouldClose(window)) {
 			glClear(GL_COLOR_BUFFER_BIT);
