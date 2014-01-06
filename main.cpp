@@ -24,6 +24,8 @@ int main(int, const char **)
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+		glfwWindowHint(GLFW_SAMPLES, 16);
+
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 		GLFWwindow *window = glfwCreateWindow(1024, 576, "Clangers", NULL, NULL);
@@ -47,6 +49,8 @@ int main(int, const char **)
 		std::clog << "[INFO] GL_RENDERER: " << glGetString(GL_RENDERER) << std::endl;
 		std::clog << "[INFO] GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
 		std::clog << "[INFO] GL_SHADING_LANGUAGE_VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+
+		glEnable(GL_MULTISAMPLE);
 
 		shader transform(GL_VERTEX_SHADER), solid_red(GL_FRAGMENT_SHADER);
 		transform.load("shaders/transform.glsl");
