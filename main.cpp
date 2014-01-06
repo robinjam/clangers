@@ -50,6 +50,10 @@ int main(int, const char **)
 			glfwPollEvents();
 		}
 	}
+	catch (const std::exception &ex) {
+		std::cerr << "[ERROR] Unhandled exception of type `" << typeid(ex).name() << "`: " << ex.what() << std::endl;
+		throw;
+	}
 	catch (...) {
 		throw;
 	}
