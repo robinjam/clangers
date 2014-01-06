@@ -8,6 +8,7 @@
 
 #include "shader.hpp"
 #include "program.hpp"
+#include "mesh.hpp"
 
 int main(int, const char **)
 {
@@ -67,22 +68,13 @@ int main(int, const char **)
 
 		test.use();
 
-		GLuint vao, vbo;
-		GLbyte vertices[] = { -1, -1, 0, 1, -1, 0, 0, 1, 0 };
-
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_BYTE, GL_FALSE, 0, NULL);
-		glEnableVertexAttribArray(0);
-
 		glm::mat4 modelview = glm::lookAt(glm::vec3(0.f, 0.f, 5.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 1.f, 100.f);
 
 		test.set_uniform("projection", projection);
+
+		mesh clanger;
+		clanger.load("meshes/clanger");
 
 		while (!glfwWindowShouldClose(window)) {
 			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 1.f, 0.f));
@@ -90,7 +82,7 @@ int main(int, const char **)
 			glfwSetTime(0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glDrawArrays(GL_TRIANGLES, 0, 3);
+			clanger.render();
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
