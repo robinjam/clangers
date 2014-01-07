@@ -129,6 +129,12 @@ int main(int, const char **)
 		mesh clanger;
 		clanger.load("meshes/clanger");
 
+		mesh clanger2;
+		clanger2.load("meshes/clanger2");
+
+		mesh boat;
+		boat.load("meshes/boat");
+
 		mesh lid1;
 		lid1.load("meshes/lid1");
 
@@ -141,8 +147,8 @@ int main(int, const char **)
 		mesh moon_surface;
 		moon_surface.load("meshes/moon_surface");
 
-		GLuint tex[6];
-		glGenTextures(6, tex);
+		GLuint tex[8];
+		glGenTextures(8, tex);
 
 		glBindTexture(GL_TEXTURE_2D, tex[0]);
 		load_texture("textures/clanger_diffuse.bmp");
@@ -174,6 +180,14 @@ int main(int, const char **)
 
 		glBindTexture(GL_TEXTURE_2D, tex[5]);
 		load_texture("textures/moon_surface_diffuse.bmp", GL_RGB, GL_BGR);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, tex[6]);
+		load_texture("textures/boat_diffuse.bmp", GL_RGB, GL_BGR);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, tex[7]);
+		load_texture("textures/boat_specular.bmp", GL_RGBA, GL_BGRA);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -267,6 +281,22 @@ int main(int, const char **)
 			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
 			test.use();
 			clanger.render();
+			model = glm::rotate(glm::mat4(1.f), float(glfwGetTime()) * -10.f, glm::vec3(0.f, 0.f, 1.f));
+			test.set_uniform("model", model);
+			clanger2.render();
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			glBindTexture(GL_TEXTURE_2D, tex[6]);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, tex[7]);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
+			test.use();
+			boat.render();
 			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, 0);
