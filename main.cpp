@@ -48,6 +48,16 @@ namespace
 
 		glTexImage2D(target, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, image_data.data());
 	}
+
+	void key_pressed(GLFWwindow *window, int key, int scancode, int action, int mods)
+	{
+		switch (key) {
+			case GLFW_KEY_ESCAPE:
+			case GLFW_KEY_Q:
+				glfwSetWindowShouldClose(window, GL_TRUE);
+				break;
+		}
+	}
 }
 
 int main(int, const char **)
@@ -75,6 +85,8 @@ int main(int, const char **)
 		}
 
 		glfwMakeContextCurrent(window);
+
+		glfwSetKeyCallback(window, key_pressed);
 
 		glewExperimental = GL_TRUE;
 		if (GLenum err = glewInit()) {
