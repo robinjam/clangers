@@ -13,9 +13,12 @@
 #include "shader.hpp"
 #include "program.hpp"
 #include "mesh.hpp"
+#include "camera.hpp"
 
 namespace
 {
+	camera cam;
+
 	void load_texture(const char *filename, GLint internalFormat = GL_RGB, GLenum format = GL_BGR, GLenum target = GL_TEXTURE_2D)
 	{
 		std::ifstream in(filename);
@@ -55,6 +58,27 @@ namespace
 			case GLFW_KEY_ESCAPE:
 			case GLFW_KEY_Q:
 				glfwSetWindowShouldClose(window, GL_TRUE);
+				break;
+			case GLFW_KEY_LEFT:
+				cam.change_angle(-0.1f);
+				break;
+			case GLFW_KEY_RIGHT:
+				cam.change_angle(0.1f);
+				break;
+			case GLFW_KEY_UP:
+				cam.accelerate(0.1f);
+				break;
+			case GLFW_KEY_DOWN:
+				cam.accelerate(-0.1f);
+				break;
+			case GLFW_KEY_SPACE:
+				cam.stop();
+				break;
+			case GLFW_KEY_PAGE_UP:
+				cam.change_altitude(0.1f);
+				break;
+			case GLFW_KEY_PAGE_DOWN:
+				cam.change_altitude(-0.1f);
 				break;
 		}
 	}
@@ -130,7 +154,6 @@ int main(int, const char **)
 		test2.detach_shader(fullscreen_triangle);
 		test2.detach_shader(skybox);
 
-		glm::mat4 view = glm::lookAt(glm::vec3(0.f, 5.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f));
 		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 1.f, 100.f);
 
 		test.set_uniform("projection", projection);
@@ -201,8 +224,9 @@ int main(int, const char **)
 
 		while (!glfwWindowShouldClose(window)) {
 			double dt = glfwGetTime() - t;
-			view = glm::rotate(view, float(dt * 45), glm::vec3(0.f, 0.f, 1.f));
+			cam.update(dt);
 			glm::mat4 model = glm::mat4(1.0f);
+			glm::mat4 view = cam.view_matrix();
 			t += dt;
 			test.set_uniform("view", view);
 			test2.set_uniform("view", view);
@@ -238,7 +262,7 @@ int main(int, const char **)
 			moon_surface.render();
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, (sin(glfwGetTime()) + 1) * 0.2f));
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, (sin(glfwGetTime()) + 1) * 0.1f));
 			test.set_uniform("model", model);
 			glBindTexture(GL_TEXTURE_2D, tex[0]);
 			glActiveTexture(GL_TEXTURE1);
