@@ -121,7 +121,7 @@ int main(int, const char **)
 		test2.detach_shader(fullscreen_triangle);
 		test2.detach_shader(skybox);
 
-		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 1.f, 100.f);
+		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 0.01f, 1000.f);
 
 		test.set_uniform("projection", projection);
 		test2.set_uniform("projection", projection);
