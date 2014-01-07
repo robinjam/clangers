@@ -118,7 +118,7 @@ int main(int, const char **)
 		test2.detach_shader(fullscreen_triangle);
 		test2.detach_shader(skybox);
 
-		glm::mat4 modelview = glm::lookAt(glm::vec3(0.f, 5.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f));
+		glm::mat4 view = glm::lookAt(glm::vec3(0.f, 5.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f));
 		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 1.f, 100.f);
 
 		test.set_uniform("projection", projection);
@@ -185,11 +185,15 @@ int main(int, const char **)
 		GLuint vao;
 		glGenVertexArrays(1, &vao);
 
+		double t = glfwGetTime();
+
 		while (!glfwWindowShouldClose(window)) {
-			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 0.f, 1.f));
+			double dt = glfwGetTime() - t;
+			view = glm::rotate(view, float(dt * 45), glm::vec3(0.f, 0.f, 1.f));
+			t += dt;
+			glm::mat4 modelview = view;
 			test.set_uniform("modelview", modelview);
 			test2.set_uniform("modelview", modelview);
-			glfwSetTime(0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
@@ -200,19 +204,6 @@ int main(int, const char **)
 			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 			glClear(GL_DEPTH_BUFFER_BIT);
-
-			glBindTexture(GL_TEXTURE_2D, tex[0]);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, tex[1]);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
-			test.use();
-			clanger.render();
-			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, 0);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, 0);
 
 			glBindTexture(GL_TEXTURE_2D, tex[3]);
 			glActiveTexture(GL_TEXTURE1);
@@ -232,6 +223,21 @@ int main(int, const char **)
 			glBindTexture(GL_TEXTURE_2D, tex[5]);
 			test.use();
 			moon_surface.render();
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			modelview = view * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, (sin(glfwGetTime()) + 1) * 0.2f));
+			test.set_uniform("modelview", modelview);
+			glBindTexture(GL_TEXTURE_2D, tex[0]);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, tex[1]);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
+			test.use();
+			clanger.render();
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, 0);
 
 			glfwSwapBuffers(window);
