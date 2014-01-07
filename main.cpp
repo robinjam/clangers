@@ -97,9 +97,11 @@ int main(int, const char **)
 
 		glClearColor(1.0, 1.0, 1.0, 0.0);
 
-		shader transform(GL_VERTEX_SHADER), phong(GL_FRAGMENT_SHADER);
+		shader transform(GL_VERTEX_SHADER), phong(GL_FRAGMENT_SHADER), fullscreen_triangle(GL_VERTEX_SHADER), skybox(GL_FRAGMENT_SHADER);
 		transform.load("shaders/transform.glsl");
 		phong.load("shaders/phong.glsl");
+		fullscreen_triangle.load("shaders/fullscreen_triangle.glsl");
+		skybox.load("shaders/skybox.glsl");
 
 		program test;
 		test.attach_shader(transform);
@@ -108,12 +110,18 @@ int main(int, const char **)
 		test.detach_shader(transform);
 		test.detach_shader(phong);
 
-		test.use();
+		program test2;
+		test2.attach_shader(fullscreen_triangle);
+		test2.attach_shader(skybox);
+		test2.link();
+		test2.detach_shader(fullscreen_triangle);
+		test2.detach_shader(skybox);
 
 		glm::mat4 modelview = glm::lookAt(glm::vec3(0.f, 5.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f));
 		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 1.f, 100.f);
 
 		test.set_uniform("projection", projection);
+		test2.set_uniform("projection", projection);
 
 		mesh clanger;
 		clanger.load("meshes/clanger");
@@ -145,18 +153,33 @@ int main(int, const char **)
 		test.set_uniform("specular_map", 1);
 		test.set_uniform("cubemap", 2);
 
+		test2.set_uniform("cubemap", 0);
+
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+
 		while (!glfwWindowShouldClose(window)) {
-			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 0.f, 1.f));
+			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(1.f, 0.f, 1.f));
 			test.set_uniform("modelview", modelview);
+			test2.set_uniform("modelview", modelview);
 			glfwSetTime(0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
+			glBindVertexArray(vao);
+			test2.use();
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+			glBindVertexArray(0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+
 			glBindTexture(GL_TEXTURE_2D, tex[0]);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, tex[1]);
 			glActiveTexture(GL_TEXTURE2);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
+			test.use();
 			clanger.render();
 			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			glActiveTexture(GL_TEXTURE1);
