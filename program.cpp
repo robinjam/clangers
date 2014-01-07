@@ -51,13 +51,24 @@ void program::use()
 	glUseProgram(name);
 }
 
+void program::set_uniform(const char *uniform_name, GLint value)
+{
+	use();
+
+	GLint location = glGetUniformLocation(name, uniform_name);
+	if (location == -1)
+		std::cerr << "Warning: No uniform named '" << uniform_name << "' found." << std::endl;
+	else
+		glUniform1i(location, value);
+}
+
 void program::set_uniform(const char *uniform_name, const glm::mat4 &value)
 {
 	use();
 
 	GLint location = glGetUniformLocation(name, uniform_name);
 	if (location == -1)
-		std::cerr << "Warning: No uniform named '" << name << "' found." << std::endl;
+		std::cerr << "Warning: No uniform named '" << uniform_name << "' found." << std::endl;
 	else
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }

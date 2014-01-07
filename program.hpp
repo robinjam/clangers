@@ -17,6 +17,7 @@ public:
 
 	void use();
 
+	void set_uniform(const char *uniform_name, GLint value);
 	void set_uniform(const char *uniform_name, const glm::mat4 &value);
 
 private:

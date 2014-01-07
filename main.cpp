@@ -16,7 +16,7 @@
 
 namespace
 {
-	void load_texture(const char *filename)
+	void load_texture(const char *filename, GLint internalFormat = GL_RGB, GLenum format = GL_BGR)
 	{
 		std::ifstream in(filename);
 		if (!in.good()) {
@@ -46,7 +46,7 @@ namespace
 		std::vector<char> image_data(image_size);
 		in.read(image_data.data(), image_size);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, image_data.data());
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, image_data.data());
 	}
 }
 
@@ -95,20 +95,22 @@ int main(int, const char **)
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 
-		shader transform(GL_VERTEX_SHADER), lambert(GL_FRAGMENT_SHADER);
+		glClearColor(1.0, 1.0, 1.0, 0.0);
+
+		shader transform(GL_VERTEX_SHADER), phong(GL_FRAGMENT_SHADER);
 		transform.load("shaders/transform.glsl");
-		lambert.load("shaders/lambert.glsl");
+		phong.load("shaders/phong.glsl");
 
 		program test;
 		test.attach_shader(transform);
-		test.attach_shader(lambert);
+		test.attach_shader(phong);
 		test.link();
 		test.detach_shader(transform);
-		test.detach_shader(lambert);
+		test.detach_shader(phong);
 
 		test.use();
 
-		glm::mat4 modelview = glm::lookAt(glm::vec3(0.f, 0.f, 5.f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 modelview = glm::lookAt(glm::vec3(0.f, 5.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f));
 		glm::mat4 projection = glm::perspective(45.f, 1024.f / 576.f, 1.f, 100.f);
 
 		test.set_uniform("projection", projection);
@@ -116,18 +118,24 @@ int main(int, const char **)
 		mesh clanger;
 		clanger.load("meshes/clanger");
 
-		GLuint tex;
-		glGenTextures(1, &tex);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		float pixels[] = {
-			0.0f, 1.0f, 0.0f,   1.0f, 0.0f, 0.0f,
-			1.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f
-		};
+		GLuint tex[2];
+		glGenTextures(2, tex);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex[0]);
 		load_texture("textures/clanger_diffuse.bmp");
 		glGenerateMipmap(GL_TEXTURE_2D);
 
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, tex[1]);
+		load_texture("textures/clanger_specular.bmp", GL_RGBA, GL_BGRA);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		test.set_uniform("diffuse_map", 0);
+		test.set_uniform("specular_map", 1);
+
 		while (!glfwWindowShouldClose(window)) {
-			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 1.f, 0.f));
+			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 0.f, 1.f));
 			test.set_uniform("modelview", modelview);
 			glfwSetTime(0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
