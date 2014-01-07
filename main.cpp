@@ -94,6 +94,7 @@ int main(int, const char **)
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		glClearColor(1.0, 1.0, 1.0, 0.0);
 
