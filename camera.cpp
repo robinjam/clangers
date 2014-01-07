@@ -7,6 +7,13 @@ camera::camera()
 {
 }
 
+void camera::preset()
+{
+	position = glm::vec3(-0.469959, 1.13729, 0.43129);
+	yaw = 2.57264f;
+	velocity = 0.f;
+}
+
 void camera::accelerate(float amount)
 {
 	velocity += amount;

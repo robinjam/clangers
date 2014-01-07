@@ -19,7 +19,7 @@ const vec3 light_specular = vec3(1.0, 1.0, 1.0);
 
 void main()
 {
-	vec4 light_direction = view * vec4(1.0, 0.0, 1.0, 0.0);
+	vec4 light_direction = view * vec4(-1.0, 0.0, 1.0, 0.0);
 	vec4 light_reflect_direction = normalize(reflect(-light_direction, es_In.normal));
 	vec4 camera_direction = vec4(0.0, 0.0, 1.0, 0.0);
 

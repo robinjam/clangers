@@ -216,6 +216,9 @@ int main(int, const char **)
 			if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
 				cam.change_altitude(-1.f * float(dt));
 			}
+			if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+				cam.preset();
+			}
 
 			cam.update(dt);
 			glm::mat4 model = glm::mat4(1.0f);

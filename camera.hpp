@@ -12,6 +12,7 @@ public:
 	void change_altitude(float amount);
 	void change_angle(float amount);
 	void update(double dt);
+	void preset();
 
 	glm::mat4 view_matrix();
 
