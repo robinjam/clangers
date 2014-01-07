@@ -16,7 +16,7 @@
 
 namespace
 {
-	void load_texture(const char *filename, GLint internalFormat = GL_RGB, GLenum format = GL_BGR)
+	void load_texture(const char *filename, GLint internalFormat = GL_RGB, GLenum format = GL_BGR, GLenum target = GL_TEXTURE_2D)
 	{
 		std::ifstream in(filename);
 		if (!in.good()) {
@@ -46,7 +46,7 @@ namespace
 		std::vector<char> image_data(image_size);
 		in.read(image_data.data(), image_size);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, image_data.data());
+		glTexImage2D(target, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, image_data.data());
 	}
 }
 
@@ -118,21 +118,32 @@ int main(int, const char **)
 		mesh clanger;
 		clanger.load("meshes/clanger");
 
-		GLuint tex[2];
-		glGenTextures(2, tex);
+		GLuint tex[3];
+		glGenTextures(3, tex);
 
-		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex[0]);
 		load_texture("textures/clanger_diffuse.bmp");
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, tex[1]);
 		load_texture("textures/clanger_specular.bmp", GL_RGBA, GL_BGRA);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
+		load_texture("textures/cubemap_right.bmp", GL_RGB, GL_BGRA, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+		load_texture("textures/cubemap_left.bmp", GL_RGB, GL_BGRA, GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
+		load_texture("textures/cubemap_top.bmp", GL_RGB, GL_BGRA, GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
+		load_texture("textures/cubemap_bottom.bmp", GL_RGB, GL_BGRA, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
+		load_texture("textures/cubemap_front.bmp", GL_RGB, GL_BGRA, GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
+		load_texture("textures/cubemap_back.bmp", GL_RGB, GL_BGRA, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
 		test.set_uniform("diffuse_map", 0);
 		test.set_uniform("specular_map", 1);
+		test.set_uniform("cubemap", 2);
 
 		while (!glfwWindowShouldClose(window)) {
 			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 0.f, 1.f));
@@ -140,7 +151,18 @@ int main(int, const char **)
 			glfwSetTime(0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, tex[0]);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, tex[1]);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
 			clanger.render();
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();

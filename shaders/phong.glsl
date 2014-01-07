@@ -2,6 +2,7 @@
 
 uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
+uniform samplerCube cubemap;
 
 in EyeSpaceVertex {
 	vec4 position;
@@ -26,5 +27,6 @@ void main()
 	vec3 diffuse = material_diffuse * max(dot(light_direction, es_In.normal), 0.0) * light_diffuse;
 	vec3 specular = max(material_specular.xyz * pow(max(dot(light_reflect_direction, camera_direction), 0.0), material_specular.w * 128) * light_specular, 0.0);
 
-	colour = vec4(diffuse + specular, 1.0);
+	vec3 reflected_direction = reflect(camera_direction, es_In.normal).xyz;
+	colour = vec4(diffuse + specular, 1.0) + material_specular.w * texture(cubemap, reflected_direction);
 }
