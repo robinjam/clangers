@@ -127,8 +127,11 @@ int main(int, const char **)
 		mesh clanger;
 		clanger.load("meshes/clanger");
 
-		GLuint tex[3];
-		glGenTextures(3, tex);
+		mesh lid;
+		lid.load("meshes/lid");
+
+		GLuint tex[5];
+		glGenTextures(5, tex);
 
 		glBindTexture(GL_TEXTURE_2D, tex[0]);
 		load_texture("textures/clanger_diffuse.bmp");
@@ -149,6 +152,14 @@ int main(int, const char **)
 		load_texture("textures/cubemap_back.bmp", GL_RGB, GL_BGRA, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+		glBindTexture(GL_TEXTURE_2D, tex[3]);
+		load_texture("textures/lid_diffuse.bmp", GL_RGBA, GL_BGRA);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, tex[4]);
+		load_texture("textures/lid_specular.bmp", GL_RGBA, GL_BGRA);
+		glGenerateMipmap(GL_TEXTURE_2D);
 
 		test.set_uniform("diffuse_map", 0);
 		test.set_uniform("specular_map", 1);
@@ -182,6 +193,19 @@ int main(int, const char **)
 			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
 			test.use();
 			clanger.render();
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			glBindTexture(GL_TEXTURE_2D, tex[3]);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, tex[4]);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
+			test.use();
+			lid.render();
 			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, 0);
