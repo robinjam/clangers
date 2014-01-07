@@ -1,6 +1,6 @@
 #version 330
 
-uniform mat4 modelview;
+uniform mat4 view;
 uniform mat4 projection;
 
 out vec3 texcoord;
@@ -14,7 +14,7 @@ void main()
 		1.0
 	);
 
-	mat4 r = modelview;
+	mat4 r = view;
 	r[3][0] = 0.0;
     r[3][1] = 0.0;
     r[3][2] = 0.0;

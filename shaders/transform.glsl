@@ -1,6 +1,7 @@
 #version 330
 
-uniform mat4 modelview;
+uniform mat4 view;
+uniform mat4 model;
 uniform mat4 projection;
 
 layout(location = 0) in vec3 position;
@@ -15,8 +16,8 @@ out EyeSpaceVertex {
 
 void main()
 {
-	es_Out.position = modelview * vec4(position, 1.0);
-	es_Out.normal = modelview * vec4(normal, 0.0);
+	es_Out.position = view * model * vec4(position, 1.0);
+	es_Out.normal = view * model * vec4(normal, 0.0);
 	es_Out.texcoord = texcoord.xy;
 	es_Out.texcoord.y = -es_Out.texcoord.y;
 	gl_Position = projection * es_Out.position;

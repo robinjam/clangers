@@ -190,10 +190,11 @@ int main(int, const char **)
 		while (!glfwWindowShouldClose(window)) {
 			double dt = glfwGetTime() - t;
 			view = glm::rotate(view, float(dt * 45), glm::vec3(0.f, 0.f, 1.f));
+			glm::mat4 model = glm::mat4(1.0f);
 			t += dt;
-			glm::mat4 modelview = view;
-			test.set_uniform("modelview", modelview);
-			test2.set_uniform("modelview", modelview);
+			test.set_uniform("view", view);
+			test2.set_uniform("view", view);
+			test.set_uniform("model", model);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
@@ -225,8 +226,8 @@ int main(int, const char **)
 			moon_surface.render();
 			glBindTexture(GL_TEXTURE_2D, 0);
 
-			modelview = view * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, (sin(glfwGetTime()) + 1) * 0.2f));
-			test.set_uniform("modelview", modelview);
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, (sin(glfwGetTime()) + 1) * 0.2f));
+			test.set_uniform("model", model);
 			glBindTexture(GL_TEXTURE_2D, tex[0]);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, tex[1]);
