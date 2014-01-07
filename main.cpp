@@ -127,11 +127,20 @@ int main(int, const char **)
 		mesh clanger;
 		clanger.load("meshes/clanger");
 
-		mesh lid;
-		lid.load("meshes/lid");
+		mesh lid1;
+		lid1.load("meshes/lid1");
 
-		GLuint tex[5];
-		glGenTextures(5, tex);
+		mesh lid2;
+		lid2.load("meshes/lid2");
+
+		mesh lid3;
+		lid3.load("meshes/lid3");
+
+		mesh moon_surface;
+		moon_surface.load("meshes/moon_surface");
+
+		GLuint tex[6];
+		glGenTextures(6, tex);
 
 		glBindTexture(GL_TEXTURE_2D, tex[0]);
 		load_texture("textures/clanger_diffuse.bmp");
@@ -154,12 +163,18 @@ int main(int, const char **)
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 		glBindTexture(GL_TEXTURE_2D, tex[3]);
-		load_texture("textures/lid_diffuse.bmp", GL_RGBA, GL_BGRA);
+		load_texture("textures/lid_diffuse.bmp", GL_RGB, GL_BGRA);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glBindTexture(GL_TEXTURE_2D, tex[4]);
 		load_texture("textures/lid_specular.bmp", GL_RGBA, GL_BGRA);
 		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, tex[5]);
+		load_texture("textures/moon_surface_diffuse.bmp", GL_RGB, GL_BGR);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		test.set_uniform("diffuse_map", 0);
 		test.set_uniform("specular_map", 1);
@@ -171,7 +186,7 @@ int main(int, const char **)
 		glGenVertexArrays(1, &vao);
 
 		while (!glfwWindowShouldClose(window)) {
-			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(1.f, 0.f, 1.f));
+			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 0.f, 1.f));
 			test.set_uniform("modelview", modelview);
 			test2.set_uniform("modelview", modelview);
 			glfwSetTime(0);
@@ -205,11 +220,18 @@ int main(int, const char **)
 			glActiveTexture(GL_TEXTURE2);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, tex[2]);
 			test.use();
-			lid.render();
+			lid1.render();
+			lid2.render();
+			lid3.render();
 			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			glBindTexture(GL_TEXTURE_2D, tex[5]);
+			test.use();
+			moon_surface.render();
 			glBindTexture(GL_TEXTURE_2D, 0);
 
 			glfwSwapBuffers(window);
