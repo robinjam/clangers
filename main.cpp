@@ -51,37 +51,6 @@ namespace
 
 		glTexImage2D(target, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, image_data.data());
 	}
-
-	void key_pressed(GLFWwindow *window, int key, int scancode, int action, int mods)
-	{
-		switch (key) {
-			case GLFW_KEY_ESCAPE:
-			case GLFW_KEY_Q:
-				glfwSetWindowShouldClose(window, GL_TRUE);
-				break;
-			case GLFW_KEY_LEFT:
-				cam.change_angle(-0.1f);
-				break;
-			case GLFW_KEY_RIGHT:
-				cam.change_angle(0.1f);
-				break;
-			case GLFW_KEY_UP:
-				cam.accelerate(0.1f);
-				break;
-			case GLFW_KEY_DOWN:
-				cam.accelerate(-0.1f);
-				break;
-			case GLFW_KEY_SPACE:
-				cam.stop();
-				break;
-			case GLFW_KEY_PAGE_UP:
-				cam.change_altitude(0.1f);
-				break;
-			case GLFW_KEY_PAGE_DOWN:
-				cam.change_altitude(-0.1f);
-				break;
-		}
-	}
 }
 
 int main(int, const char **)
@@ -109,8 +78,6 @@ int main(int, const char **)
 		}
 
 		glfwMakeContextCurrent(window);
-
-		glfwSetKeyCallback(window, key_pressed);
 
 		glewExperimental = GL_TRUE;
 		if (GLenum err = glewInit()) {
@@ -224,6 +191,32 @@ int main(int, const char **)
 
 		while (!glfwWindowShouldClose(window)) {
 			double dt = glfwGetTime() - t;
+
+			if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+				glfwSetWindowShouldClose(window, GL_TRUE);
+			}
+			if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+				cam.change_angle(-1.f * float(dt));
+			}
+			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+				cam.change_angle(1.f * float(dt));
+			}
+			if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+				cam.accelerate(1.f * float(dt));
+			}
+			if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+				cam.accelerate(-1.f * float(dt));
+			}
+			if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+				cam.stop();
+			}
+			if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
+				cam.change_altitude(1.f * float(dt));
+			}
+			if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
+				cam.change_altitude(-1.f * float(dt));
+			}
+
 			cam.update(dt);
 			glm::mat4 model = glm::mat4(1.0f);
 			glm::mat4 view = cam.view_matrix();
