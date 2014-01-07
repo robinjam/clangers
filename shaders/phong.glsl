@@ -4,6 +4,8 @@ uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
 uniform samplerCube cubemap;
 
+uniform mat4 view;
+
 in EyeSpaceVertex {
 	vec4 position;
 	vec4 normal;
@@ -17,7 +19,7 @@ const vec3 light_specular = vec3(1.0, 1.0, 1.0);
 
 void main()
 {
-	vec4 light_direction = vec4(1.0, 0.0, 1.0, 0.0);
+	vec4 light_direction = view * vec4(1.0, 0.0, 1.0, 0.0);
 	vec4 light_reflect_direction = normalize(reflect(-light_direction, es_In.normal));
 	vec4 camera_direction = vec4(0.0, 0.0, 1.0, 0.0);
 
