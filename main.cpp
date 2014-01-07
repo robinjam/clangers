@@ -5,10 +5,50 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <fstream>
+#include <string>
+#include <cmath>
+#include <vector>
 
 #include "shader.hpp"
 #include "program.hpp"
 #include "mesh.hpp"
+
+namespace
+{
+	void load_texture(const char *filename)
+	{
+		std::ifstream in(filename);
+		if (!in.good()) {
+			throw std::runtime_error(std::string("Unable to open ") + filename);
+		}
+
+		char header[54];
+		in.read(header, 54);
+		if (!in.good() || header[0] != 'B' || header[1] != 'M') {
+			throw std::runtime_error(std::string("Invalid bitmap format"));
+		}
+
+		int32_t file_size = *(int32_t *)&(header[0x02]);
+		int32_t header_size = *(int32_t *)&(header[0x0A]);
+		int32_t width = *(int32_t *)&(header[0x12]);
+		int32_t height = abs(*(int32_t *)&(header[0x16]));
+		int32_t offset = header_size - 54;
+		int32_t image_size = file_size - header_size;
+
+		std::cout << "file_size: " << file_size << std::endl;
+		std::cout << "header_size: " << header_size << std::endl;
+		std::cout << "width: " << width << std::endl;
+		std::cout << "height: " << height << std::endl;
+		std::cout << "offset: " << offset << std::endl;
+		std::cout << "image_size: " << image_size << std::endl;
+
+		std::vector<char> image_data(image_size);
+		in.read(image_data.data(), image_size);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, image_data.data());
+	}
+}
 
 int main(int, const char **)
 {
@@ -55,16 +95,16 @@ int main(int, const char **)
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 
-		shader transform(GL_VERTEX_SHADER), solid_red(GL_FRAGMENT_SHADER);
+		shader transform(GL_VERTEX_SHADER), lambert(GL_FRAGMENT_SHADER);
 		transform.load("shaders/transform.glsl");
-		solid_red.load("shaders/solid_red.glsl");
+		lambert.load("shaders/lambert.glsl");
 
 		program test;
 		test.attach_shader(transform);
-		test.attach_shader(solid_red);
+		test.attach_shader(lambert);
 		test.link();
 		test.detach_shader(transform);
-		test.detach_shader(solid_red);
+		test.detach_shader(lambert);
 
 		test.use();
 
@@ -75,6 +115,16 @@ int main(int, const char **)
 
 		mesh clanger;
 		clanger.load("meshes/clanger");
+
+		GLuint tex;
+		glGenTextures(1, &tex);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		float pixels[] = {
+			0.0f, 1.0f, 0.0f,   1.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f
+		};
+		load_texture("textures/clanger_diffuse.bmp");
+		glGenerateMipmap(GL_TEXTURE_2D);
 
 		while (!glfwWindowShouldClose(window)) {
 			modelview = glm::rotate(modelview, float(glfwGetTime() * 45), glm::vec3(0.f, 1.f, 0.f));
