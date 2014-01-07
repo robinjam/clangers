@@ -18,6 +18,7 @@
 namespace
 {
 	camera cam;
+	bool tour = false;
 
 	void load_texture(const char *filename, GLint internalFormat = GL_RGB, GLenum format = GL_BGR, GLenum target = GL_TEXTURE_2D)
 	{
@@ -50,6 +51,59 @@ namespace
 		in.read(image_data.data(), image_size);
 
 		glTexImage2D(target, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, image_data.data());
+	}
+
+	void do_tour(double t)
+	{
+		if (t < 5) {
+			glm::vec3 start = glm::vec3(0.f, 2.f, 0.5f);
+			glm::vec3 step = (glm::vec3(-0.469959, 1.13729, 0.43129) - start) / glm::vec3(5);
+			cam.position = start + step * glm::vec3(t);
+			cam.yaw = 3.14f - 0.113472 * t;
+		}
+		else if (t > 10 && t < 15) {
+			double u = t - 10;
+			glm::vec3 start(-0.469959, 1.13729, 0.43129);
+			glm::vec3 step = (glm::vec3(2.05243, 3.91877, 0.983068) - start) / glm::vec3(5);
+			cam.position = start + step * glm::vec3(u);
+
+			double yaw_start = 2.57264f;
+			double yaw_end = 3.73302f;
+			cam.yaw = yaw_start + ((yaw_end - yaw_start) / 5) * u;
+		}
+		else if (t > 20 && t < 25) {
+			double u = t - 20;
+			glm::vec3 start(2.05243, 3.91877, 0.983068);
+			glm::vec3 step = (glm::vec3(-6.32559, -3.20083, 2.01724) - start) / glm::vec3(5);
+			cam.position = start + step * glm::vec3(u);
+
+			double yaw_start = 3.73302f;
+			double yaw_end = 0.99759f;
+			cam.yaw = yaw_start + ((yaw_end - yaw_start) / 5) * u;
+		}
+		else if (t > 30 && t < 35) {
+			double u = t - 30;
+			glm::vec3 start(-6.32559, -3.20083, 2.01724);
+			glm::vec3 step = (glm::vec3(-1.20865, 0.0177682, 2.09559) - start) / glm::vec3(5);
+			cam.position = start + step * glm::vec3(u);
+
+			double yaw_start = 0.99759f;
+			double yaw_end = -0.756993f;
+			cam.yaw = yaw_start + ((yaw_end - yaw_start) / 5) * u;
+		}
+		else if (t > 40 && t < 45) {
+			double u = t - 40;
+			glm::vec3 start(-1.20865, 0.0177682, 2.09559);
+			glm::vec3 step = (glm::vec3(0.f, 2.f, 0.5f) - start) / glm::vec3(5);
+			cam.position = start + step * glm::vec3(u);
+
+			double yaw_start = -0.756993f;
+			double yaw_end = 3.14f;
+			cam.yaw = yaw_start + ((yaw_end - yaw_start) / 5) * u;
+		}
+		else if (t > 45) {
+			tour = false;
+		}
 	}
 }
 
@@ -209,29 +263,42 @@ int main(int, const char **)
 			if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
 				glfwSetWindowShouldClose(window, GL_TRUE);
 			}
-			if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-				cam.change_angle(-1.f * float(dt));
+			if (tour) {
+				do_tour(t);
+				if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+					tour = false;
+				}
 			}
-			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-				cam.change_angle(1.f * float(dt));
-			}
-			if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-				cam.accelerate(1.f * float(dt));
-			}
-			if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-				cam.accelerate(-1.f * float(dt));
-			}
-			if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-				cam.stop();
-			}
-			if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
-				cam.change_altitude(1.f * float(dt));
-			}
-			if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
-				cam.change_altitude(-1.f * float(dt));
-			}
-			if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-				cam.preset();
+			else {
+				if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+					cam.change_angle(-1.f * float(dt));
+				}
+				if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+					cam.change_angle(1.f * float(dt));
+				}
+				if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+					cam.accelerate(1.f * float(dt));
+				}
+				if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+					cam.accelerate(-1.f * float(dt));
+				}
+				if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+					cam.stop();
+				}
+				if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
+					cam.change_altitude(1.f * float(dt));
+				}
+				if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
+					cam.change_altitude(-1.f * float(dt));
+				}
+				if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+					cam.preset();
+				}
+				if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+					tour = true;
+					cam.stop();
+					glfwSetTime(0);
+				}
 			}
 
 			cam.update(dt);

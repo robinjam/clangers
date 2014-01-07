@@ -2,9 +2,8 @@
 
 #include <glm/glm.hpp>
 
-class camera
+struct camera
 {
-public:
 	camera();
 
 	void accelerate(float amount);
@@ -16,7 +15,6 @@ public:
 
 	glm::mat4 view_matrix();
 
-private:
 	float yaw, velocity;
 	glm::vec3 position;
 };
